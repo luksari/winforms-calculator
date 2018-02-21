@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Globalization;
+using System.Threading;
 
 namespace winforms_calculator
 {
@@ -14,9 +16,12 @@ namespace winforms_calculator
         [STAThread]
         static void Main()
         {
+            CultureInfo cl;
+            cl = CultureInfo.CreateSpecificCulture("en-US");
+            Thread.CurrentThread.CurrentCulture = cl;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+            Application.Run(new Kalkulator());
         }
     }
 }
