@@ -14,9 +14,9 @@ namespace winforms_calculator
 {
     public partial class Kalkulator : Form
     {
-        private Double result = 0;
-        private String operation = "";
-        private Double operandFirst = 0, operandSecond = 0;
+        private string result;
+        private string operation = "";
+        private string operandFirst = string.Empty, operandSecond = string.Empty;
         private bool isCalculating = false;
 
         public Kalkulator()
@@ -24,7 +24,7 @@ namespace winforms_calculator
             InitializeComponent();
         }
 
-        public Double Result
+        public string Result
         {
             get
             {
@@ -37,7 +37,7 @@ namespace winforms_calculator
             }
         }
 
-        public String Operation
+        public string Operation
         {
             get
             {
@@ -63,7 +63,7 @@ namespace winforms_calculator
             }
         }
 
-        public double OperandFirst
+        public string OperandFirst
         {
             get
             {
@@ -76,7 +76,7 @@ namespace winforms_calculator
             }
         }
 
-        public double OperandSecond
+        public string OperandSecond
         {
             get
             {
@@ -95,71 +95,101 @@ namespace winforms_calculator
                 textBoxValue.Text = "";
 
             IsCalculating = false;
-
-            Button btn = (Button)sender;
-
-            if (btn.Text == ".")
+            try
             {
-                if (!textBoxValue.Text.Contains("."))
-                    textBoxValue.Text = textBoxValue.Text + btn.Text;
-            }
-            else
-                textBoxValue.Text = textBoxValue.Text + btn.Text;
+                Button btn = sender as Button;
 
-        
+                if (btn.Text == ".")
+                {
+                    if (!textBoxValue.Text.Contains("."))
+                        textBoxValue.Text = textBoxValue.Text + btn.Text;
+                }
+                else
+                {
+                    textBoxValue.Text = textBoxValue.Text + btn.Text;
+
+                }
+                if (textBoxValue.Text.Length >= 14)
+                    textBoxValue.Text = textBoxValue.Text.Remove(textBoxValue.Text.Length - 1);
+ 
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Nastąpił niespodziewany błąd, szczegóły" +
+                    ex.Message);
+            }
         }
 
         private void buttonOperator_Click(object sender, EventArgs e)
         {
-            Button btn = (Button)sender;
+            try
+            {
+                Button btn = sender as Button;
+                double res;
+                double.TryParse(Result, out res);
 
-            if (Result != 0)
-            {
-                buttonEquals.PerformClick();
-                Operation = btn.Text;
-                labelCurrentOperation.Text = operandFirst + " " + Operation;
-                IsCalculating = true;
+                if (res != 0)
+                {
+                    Operation = btn.Text;
+                    OperandFirst = textBoxValue.Text;
+                    labelCurrentOperation.Text = OperandFirst + " " + Operation;
+                    IsCalculating = true;
+                }
+                else
+                {
+                    Operation = btn.Text;
+                    OperandFirst = textBoxValue.Text;
+                    labelCurrentOperation.Text = OperandFirst + " " + Operation;
+                    IsCalculating = true;
+                }
+
+       
             }
-            else
+            catch(Exception ex)
             {
-                Operation = btn.Text;
-                OperandFirst = Double.Parse(textBoxValue.Text);
-                labelCurrentOperation.Text = OperandFirst + " " + Operation;
-                IsCalculating = true;
+                MessageBox.Show("Nastąpił niespodziewany błąd, szczegóły" +
+                    ex.Message);
             }
         }
 
         private void buttonEquals_Click(object sender, EventArgs e)
         {
-            operandSecond = Double.Parse(textBoxValue.Text);
+            OperandSecond = textBoxValue.Text;
+            double opr1, opr2;
+          
+
+            double.TryParse(OperandFirst, out opr1);
+            double.TryParse(OperandSecond, out opr2);
+
             switch (Operation)
             {
                 case "+":
-                    Result = operandFirst + operandSecond;
+                    Result = (opr1+opr2).ToString();
                     break;
                 case "-":
-                    Result = operandFirst - operandSecond;
+                    Result = (opr1-opr2).ToString();
                     break;
                 case "*":
-                    Result = operandFirst * operandSecond;
+                    Result = (opr1 * opr2).ToString();
                     break;
                 case "/":
-                    if(operandSecond == 0)
+                    if(opr2 == 0)
                     {
                         MessageBox.Show("Dzielenie przez 0 jest niewykonalne!");
                     }
                     else
                     {
-                        Result = operandFirst / operandSecond;
+                        Result = (opr1 / opr2).ToString();
                     }
                     break;
                 default:
                     break;
             }
-            textBoxValue.Text = Result.ToString();
+            textBoxValue.Text = Result;
             OperandFirst = Result;
             Operation = "";
-            labelCurrentOperation.Text = OperandFirst.ToString();
+            labelCurrentOperation.Text = OperandFirst;
         }
 
         private void buttonPop_Click(object sender, EventArgs e)
@@ -174,7 +204,13 @@ namespace winforms_calculator
 
         private void buttonNegative_Click(object sender, EventArgs e)
         {
-            textBoxValue.Text = (Result * -1).ToString();
+
+            if (textBoxValue.Text.Length <= 0 || textBoxValue.Text == "0")
+                return;
+            if (textBoxValue.Text[0] == '-')
+                textBoxValue.Text = textBoxValue.Text.Remove(0, 1);
+            else
+                textBoxValue.Text = textBoxValue.Text.Insert(0, "-");
         }
 
         private void textBoxValue_Click(object sender, EventArgs e)
@@ -185,9 +221,9 @@ namespace winforms_calculator
         private void buttonClearAll_Click(object sender, EventArgs e)
         {
             textBoxValue.Text = "0";
-            Result = 0;
-            OperandFirst = 0;
-            labelCurrentOperation.Text = OperandFirst.ToString();
+            Result = string.Empty;
+            OperandFirst = string.Empty;
+            labelCurrentOperation.Text = OperandFirst;
         }
     }
 }
